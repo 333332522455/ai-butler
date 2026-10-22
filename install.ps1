@@ -279,7 +279,7 @@ if (Test-Path $licTool) {
     $licActivated = ($LASTEXITCODE -eq 0)
   } catch { }
 }
-if ($machineCode -match '^(....)(....)(....)(....)$') { $machineShow = '$1-$2-$3-$4' } else { $machineShow = $machineCode }
+if ($machineCode -match '^(....)(....)(....)(....)$') { $machineShow = $machineCode -replace '^(....)(....)(....)(....)$', '$1-$2-$3-$4' } else { $machineShow = $machineCode }
 if ($licActivated) {
   Ok ('授权：已激活（本机机器码 ' + $machineShow + '）')
 } elseif ($machineCode) {
