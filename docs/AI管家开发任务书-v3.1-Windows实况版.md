@@ -230,7 +230,10 @@ irm dsh.example.com/i -OutFile install.ps1; notepad install.ps1; .\install.ps1
 - 「先看再跑」写在 README：`irm ... -OutFile boot.ps1` → `notepad boot.ps1` → 手动执行。
 - 端到端实测：`irm` 取 Pages 上 2700 字节 → 下载 zip 61KB → 解包 → `install.ps1 -DryRun` 走完八步、8/8 OK、`BOOT_EXIT=0`，临时目录已自动清理。
 - 顺带修：`install.ps1` 的授权段原来只认 `$InstallDir\tools\license.py`，`-DryRun`（还没复制文件）会误报「读不到机器码」；加了回退到 `$PSScriptRoot\tools\license.py`。
-- 验证脚本 `D:\sleep\logs\_verify_oneshot.py`（26 项：Pages 200、内容与仓库一致、codeload zip 200、bootstrap 纯 ASCII、无 `exit ` 语句、`$global:LASTEXITCODE`、`AI_BUTLER_INSTALL_ARGS`/`AI_BUTLER_ZIP_URL`/`AI_BUTLER_KEEP_TEMP` 三个开关、install/uninstall/README/任务书同步、两份 ps1 BOM + ParseFile errors=0、远端 19 个文件齐全且中文文件名未乱码、DryRun 端到端退出 0），已入 `D:\sleep\logs\verify.jsonl`。
+- 验证脚本 `D:\sleep\logs\_verify_oneshot.py`（26 项：Pages 200、内容与仓库一致、codeload zip 200、bootstrap 纯 ASCII、`exit` 由 dot-source 判定守卫、`$global:LASTEXITCODE`、`AI_BUTLER_INSTALL_ARGS`/`AI_BUTLER_ZIP_URL`/`AI_BUTLER_KEEP_TEMP` 三个开关、install/uninstall/README/任务书同步、两份 ps1 BOM + ParseFile errors=0、远端 19 个文件齐全且中文文件名未乱码、DryRun 端到端退出 0），已入 `D:\sleep\logs\verify.jsonl`。
+- **下载动效（2026-10-22 追加）**：ASCII banner 逐行打印 + `#>` 30 格进度条（百分比 / MB / KB每秒 / ETA）+ 连接阶段 spinner（带已等秒数）。`Bar()` 只在真实控制台开；重定向自动关（`AI_BUTLER_PLAIN=1`），`AI_BUTLER_ANIM=1` 强制开。
+- **抗卡死（2026-10-22 追加）**：`BeginGetResponse` 异步连接 + 80ms 轮询，连接 25 秒超时、`ReadWriteTimeout=15s`；失败清掉半截文件并重试，最多 3 次，最终抛「download failed after 3 tries: <原因>」。
+- **退出码修正**：原脚本只设 `$global:LASTEXITCODE`，`-File` 调用时进程仍退 0，失败被 CI/批处理当成功。改为 `if (-not $dotSourced) { exit $code }`（`. ` 点源 / `iex` 下仍只设 LASTEXITCODE，不会关终端）。实测：死链 → 退出 1 且打 3 次重试；好链 → 退出 0；`Get-Content -Raw | iex` → 终端存活。
 
 
 ### 9.3 install.ps1 必须做到的六件事

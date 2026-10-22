@@ -32,6 +32,8 @@ irm https://333332522455.github.io/ai-butler/bootstrap.ps1 | iex
 
 `bootstrap.ps1` 只做三件事：从 codeload 下载本仓 zip → 解到 `%TEMP%` → 调用包里的 `install.ps1`，跑完自动清理临时目录。
 
+下载过程有动画：ASCII banner、`#>` 进度条（百分比 / MB / KB每秒 / ETA）、连接阶段带秒数的 spinner；连接 25 秒超时、读超时 15 秒，失败自动重试 3 次，最终失败会带明确原因退出（退出码 1）。重定向/CI 环境自动关动画（`AI_BUTLER_ANIM=1` 可强制打开）。
+
 想先看再跑：
 
 ```powershell
@@ -47,7 +49,8 @@ $env:AI_BUTLER_INSTALL_ARGS='-DryRun'; irm https://333332522455.github.io/ai-but
 ```
 
 环境变量：`AI_BUTLER_INSTALL_ARGS`（转给 install.ps1 的参数，如 `-NoAutostart`）、
-`AI_BUTLER_ZIP_URL`（换包源，镜像/离线）、`AI_BUTLER_KEEP_TEMP=1`（保留解包目录）。
+`AI_BUTLER_ZIP_URL`（换包源，镜像/离线）、`AI_BUTLER_KEEP_TEMP=1`（保留解包目录）、
+`AI_BUTLER_PLAIN=1`（关动画）、`AI_BUTLER_ANIM=1`（强制开动画）。
 
 `install.ps1` 做八件事：探测 Python（3.9+，含 pythonw）/ 检查 Pillow / 校验安装源 /
 检测热键是否被占用 / 发现已在运行的旧实例 / 复制文件到安装目录并生成启动器 /
