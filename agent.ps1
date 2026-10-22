@@ -1,4 +1,4 @@
-﻿# agent.ps1 - a small Claude-Code-like agent for Windows PowerShell (no install, no Node).
+# agent.ps1 - a small Claude-Code-like agent for Windows PowerShell (no install, no Node).
 #
 #   powershell -NoProfile -ExecutionPolicy Bypass -File agent.ps1
 #   powershell -File agent.ps1 -Once "find the bug in main.c" -yes
@@ -311,6 +311,9 @@ function Run-Turn($userText) {
         }
         default { $result = ("ERROR: unknown tool " + $name) }
       }
+      $preview = ([string]$result) -replace "`r?`n", " "
+      if ($preview.Length -gt 240) { $preview = $preview.Substring(0, 240) + " ..." }
+      if ($preview.Trim().Length -gt 0) { Say ("  [out] " + $preview) DarkGray }
       [void]$script:History.Add(@{ role = "tool"; tool_call_id = [string]$call.id; content = $result })
     }
   }
