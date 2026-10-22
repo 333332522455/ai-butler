@@ -26,19 +26,28 @@
 
 ## 安装（一条命令）
 
-先看再跑（推荐）：
-
 ```powershell
-irm <你的短链>/i -OutFile install.ps1
-notepad install.ps1
-powershell -NoProfile -ExecutionPolicy Bypass -File .\install.ps1
+irm https://333332522455.github.io/ai-butler/bootstrap.ps1 | iex
 ```
 
-装了不用也能先体检：
+`bootstrap.ps1` 只做三件事：从 codeload 下载本仓 zip → 解到 `%TEMP%` → 调用包里的 `install.ps1`，跑完自动清理临时目录。
+
+想先看再跑：
 
 ```powershell
-powershell -NoProfile -ExecutionPolicy Bypass -File .\install.ps1 -DryRun
+irm https://333332522455.github.io/ai-butler/bootstrap.ps1 -OutFile boot.ps1
+notepad boot.ps1
+powershell -NoProfile -ExecutionPolicy Bypass -File .\boot.ps1
 ```
+
+装了不用也能先体检（不落盘）：
+
+```powershell
+$env:AI_BUTLER_INSTALL_ARGS='-DryRun'; irm https://333332522455.github.io/ai-butler/bootstrap.ps1 | iex
+```
+
+环境变量：`AI_BUTLER_INSTALL_ARGS`（转给 install.ps1 的参数，如 `-NoAutostart`）、
+`AI_BUTLER_ZIP_URL`（换包源，镜像/离线）、`AI_BUTLER_KEEP_TEMP=1`（保留解包目录）。
 
 `install.ps1` 做八件事：探测 Python（3.9+，含 pythonw）/ 检查 Pillow / 校验安装源 /
 检测热键是否被占用 / 发现已在运行的旧实例 / 复制文件到安装目录并生成启动器 /

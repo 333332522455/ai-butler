@@ -221,6 +221,18 @@ irm dsh.example.com/i -OutFile install.ps1; notepad install.ps1; .\install.ps1
 ```
 `irm | iex` 是不看内容直接执行的经典反模式，懂行的人会因此不敢用。
 
+**落地状态（2026-10-22）**：已上线，走 GitHub Pages（零成本，无域名、无 302）。
+
+- 一条命令：`irm https://333332522455.github.io/ai-butler/bootstrap.ps1 | iex`（含协议 71 字符，比 30 字符目标长，但不需要自有域名；有域名时套 302 即可缩到 `irm dsh.example.com/i | iex`）。
+- `bootstrap.ps1`（2699 字节，**纯 ASCII**，避免 `irm | iex` 下的编码问题）只做三件事：① 从 **codeload** 下载本仓 zip ② `Expand-Archive` 到 `%TEMP%\ai-butler-boot-<8hex>` ③ 找含 `install.ps1` 的目录并用 `powershell -File` 跑。跑完 `finally` 里删临时目录；`AI_BUTLER_KEEP_TEMP=1` 保留。
+- 参数透传靠环境变量 `AI_BUTLER_INSTALL_ARGS`（空格分隔，如 `-DryRun -NoAutostart`）；包源可换 `AI_BUTLER_ZIP_URL`。脚本末尾写 `$global:LASTEXITCODE` 而不是 `exit`——在 `iex` 里 `exit` 会关掉用户的终端窗口。
+- **为什么不用 `github.com/<user>/<repo>/archive/...`**：本机实测 `github.com` 直连被阻断（`Recv failure: Connection was reset`），`api.github.com`、`codeload.github.com`、`*.github.io` 均可达。同样是「download raw」，codeload 通、archive 不通。换网络环境时这条会变，脚本里只是默认值，可用 `AI_BUTLER_ZIP_URL` 覆盖。
+- 「先看再跑」写在 README：`irm ... -OutFile boot.ps1` → `notepad boot.ps1` → 手动执行。
+- 端到端实测：`irm` 取 Pages 上 2700 字节 → 下载 zip 61KB → 解包 → `install.ps1 -DryRun` 走完八步、8/8 OK、`BOOT_EXIT=0`，临时目录已自动清理。
+- 顺带修：`install.ps1` 的授权段原来只认 `$InstallDir\tools\license.py`，`-DryRun`（还没复制文件）会误报「读不到机器码」；加了回退到 `$PSScriptRoot\tools\license.py`。
+- 验证脚本 `D:\sleep\logs\_verify_oneshot.py`（26 项：Pages 200、内容与仓库一致、codeload zip 200、bootstrap 纯 ASCII、无 `exit ` 语句、`$global:LASTEXITCODE`、`AI_BUTLER_INSTALL_ARGS`/`AI_BUTLER_ZIP_URL`/`AI_BUTLER_KEEP_TEMP` 三个开关、install/uninstall/README/任务书同步、两份 ps1 BOM + ParseFile errors=0、远端 19 个文件齐全且中文文件名未乱码、DryRun 端到端退出 0），已入 `D:\sleep\logs\verify.jsonl`。
+
+
 ### 9.3 install.ps1 必须做到的六件事
 
 1. **探测而非硬编码**：找 python / node / DSH 安装目录 / 目标安装路径（本机是 `D:\sleep` + `D:\新建文件夹 (2)`，换机全不同）；

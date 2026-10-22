@@ -269,6 +269,7 @@ if ($NoStart -or $DryRun) {
 
 # ---------- 授权状态（离线激活码，任务书 9.5）----------
 $licTool = Join-Path $InstallDir 'tools\license.py'
+if (-not (Test-Path $licTool)) { $licTool = Join-Path $PSScriptRoot 'tools\license.py' }
 $licActivated = $false
 $machineCode = ''
 if (Test-Path $licTool) {
