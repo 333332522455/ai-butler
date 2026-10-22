@@ -87,6 +87,40 @@ py tools\agent-bubble.py    REM 操控气泡（需要 Pillow）
 py tools\window_shot.py --check   REM 看前台窗口和黑名单判定
 ```
 
+## 临时用一下：零安装聊天客户端（不用装 DSH）
+
+换电脑、借朋友机器、只想问两句的时候，用这一个脚本就够，不需要 Python、不需要安装：
+
+```powershell
+irm https://333332522455.github.io/ai-butler/chat.ps1 | iex
+```
+
+也可以只下一次、看清楚了再跑：
+
+```powershell
+irm https://333332522455.github.io/ai-butler/chat.ps1 -OutFile chat.ps1
+notepad chat.ps1
+powershell -NoProfile -ExecutionPolicy Bypass -File .\chat.ps1
+```
+
+非交互（适合管道和测试）：
+
+```powershell
+powershell -File .\chat.ps1 -Once "这段报错怎么改：0xC0000005"
+```
+
+能力：流式逐字输出、多轮上下文（自动限长）、`/file <路径>` 把文件带进对话（文本，2 MB 上限、超长截断）、`/save` 存 markdown、`/model` 换模型、`/cost` 看本次 token、`/key` 换 key、`/help` 看全部。
+
+### 保密管理（重要）
+
+- **它不含任何密钥**。仓库里只有一个空壳脚本，谁拿到都得自己填 key。
+- key 只存在你这台机器的 `%APPDATA%\minichat\key.txt`（UTF-8 无 BOM，仅当前用户可读），
+  或临时用 `-key` / 环境变量 `MINICHAT_API_KEY` 传入。
+- 界面上 key 只显示成 `sk-a...9f2c` 这种掩码，**任何日志、报错、`/save` 导出里都不会出现完整 key**。
+- 想彻底不留痕：不用 `/key`，每次用环境变量传，关掉窗口就没了。
+- 默认模型 `deepseek-chat`，可 `-model` 或 `/model` 换；默认地址 `https://api.deepseek.com/v1`，可 `-base` 换成任何 OpenAI 兼容端点（本地 8090 代理、自建网关都行）。
+
+
 ## 已知限制（正在做）
 
 - 常驻方式仍是"wscript 包 vbs 后台跑 pythonw"，没做成托盘程序。
