@@ -1,0 +1,25 @@
+# 运行期产物
+__pycache__/
+*.pyc
+*.log
+*.jsonl
+logs/
+.state/
+.venv/
+venv/
+
+# 截图与本地状态
+shots/
+*.png
+*.jpg
+
+# 本机配置（向导生成，含本机路径/热键，不进仓库）
+config.json
+
+# 凭据
+.env
+.env.*
+*.key
+*.pem
+secret.json
+license.json

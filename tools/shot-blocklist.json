@@ -1,0 +1,78 @@
+{
+  "_说明": "title 里出现这些词（不区分大小写）或进程名命中 exe 列表，就只发文字不截图。改完不用重启热键进程，下一次呼出生效。",
+  "凭据": [
+    "1password",
+    "bitwarden",
+    "keepass",
+    "lastpass",
+    "password",
+    "passwd",
+    "密码",
+    "凭据",
+    "credential",
+    "密钥",
+    "token"
+  ],
+  "支付": [
+    "支付宝",
+    "alipay",
+    "微信支付",
+    "wechat pay",
+    "网银",
+    "银行",
+    "bank",
+    "转账",
+    "付款",
+    "支付",
+    "checkout",
+    "信用卡"
+  ],
+  "聊天": [
+    "微信",
+    "wechat",
+    "weixin",
+    "qq",
+    "tim",
+    "telegram",
+    "whatsapp",
+    "discord"
+  ],
+  "邮箱": [
+    "outlook",
+    "foxmail",
+    "thunderbird",
+    "邮箱",
+    "mail.google",
+    "gmail",
+    "mail"
+  ],
+  "私密": [
+    "私密",
+    "隐私",
+    "无痕",
+    "incognito",
+    "private browsing"
+  ],
+  "登录": [
+    "登录",
+    "登陆",
+    "login",
+    "sign in",
+    "signin",
+    "验证码",
+    "扫码登录"
+  ],
+  "exe": [
+    "1password.exe",
+    "keepass.exe",
+    "bitwarden.exe",
+    "wechat.exe",
+    "weixin.exe",
+    "qq.exe",
+    "tim.exe",
+    "outlook.exe",
+    "foxmail.exe",
+    "discord.exe",
+    "telegram.exe"
+  ]
+}
