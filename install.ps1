@@ -267,6 +267,19 @@ if ($NoStart -or $DryRun) {
   }
 }
 
+# ---------- 桌面工作区（agent.ps1）----------
+$wsDir = Join-Path ([Environment]::GetFolderPath('Desktop')) 'ai-butler-workspace'
+try {
+  if (-not (Test-Path $wsDir)) { New-Item -ItemType Directory -Force -Path $wsDir | Out-Null }
+  $srcAgent = Join-Path $PSScriptRoot 'agent.ps1'
+  if (Test-Path $srcAgent) {
+    Copy-Item -LiteralPath $srcAgent -Destination (Join-Path $wsDir 'agent.ps1') -Force
+    Ok ('桌面工作区: ' + $wsDir + ' (agent.ps1 已就位)')
+  } else {
+    Warn '仓库里找不到 agent.ps1，桌面工作区只建了目录'
+  }
+} catch { Warn ('建桌面工作区失败: ' + $_.Exception.Message) }
+
 # ---------- 授权状态（离线激活码，任务书 9.5）----------
 $licTool = Join-Path $InstallDir 'tools\license.py'
 if (-not (Test-Path $licTool)) { $licTool = Join-Path $PSScriptRoot 'tools\license.py' }
@@ -296,6 +309,7 @@ Write-Host ('  日志     : ' + (Join-Path $logsDir 'hotkey.log'))
 Write-Host ('  截图     : ' + (Join-Path $logsDir 'shots'))
 Write-Host ('  授权     : ' + $(if ($licActivated) { '已激活 ' + $machineShow } else { '未激活 ' + $machineShow }))
 Write-Host ('  改配置   : python "' + (Join-Path $InstallDir 'tools\wizard.py') + '"（热键/投递地址/截图开关，可单独重跑）')
+Write-Host ('  工作区   : ' + $wsDir + '  (powershell -File "' + (Join-Path $wsDir 'agent.ps1') + '")')
 Write-Host ('  卸载     : powershell -NoProfile -File "' + $PSScriptRoot + '\uninstall.ps1" -InstallDir "' + $InstallDir + '"')
 if ($script:Warn -gt 0) {
   Write-Host ('  注意：有 ' + $script:Warn + ' 条警告（见上面 [!]）') -ForegroundColor Yellow

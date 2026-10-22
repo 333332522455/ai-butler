@@ -121,6 +121,28 @@ powershell -File .\chat.ps1 -Once "这段报错怎么改：0xC0000005"
 - 默认模型 `deepseek-chat`，可 `-model` 或 `/model` 换；默认地址 `https://api.deepseek.com/v1`，可 `-base` 换成任何 OpenAI 兼容端点（本地 8090 代理、自建网关都行）。
 
 
+## 像 Claude Code 一样用：本地工作区 agent（agent.ps1）
+
+chat.ps1 只能聊；`agent.ps1` 能自己看文件、跑命令、读报错、改完再自测。同样零依赖、纯 PowerShell。
+
+```powershell
+irm https://333332522455.github.io/ai-butler/agent.ps1 -OutFile agent.ps1
+powershell -NoProfile -ExecutionPolicy Bypass -File .\agent.ps1
+```
+
+第一次运行会**在桌面建一个 `ai-butler-workspace` 文件夹**当工作区（`install.ps1` 安装时也会顺手建好并把 agent.ps1 放进去）。
+
+- 工作区：默认 `桌面\ai-butler-workspace`，可用 `-ws <目录>` 或环境变量 `AGENT_WORKSPACE` 换。
+- 四个工具：`list_dir` / `read_file` / `grep` / `run_command`。**所有路径都被围栏在work区里**，`..\..\win.ini` 这类越界请求会被直接拒绝。
+- 审批：只有 `run_command` 会问一次，`[y]es` 单次放行、`[n]o` 拒绝、`[a]ll` 本次会话之后全放行；启动时带 `-yes` 等于全自动（自己看着办）。
+- 收尾小测试：每轮任务结束时自动跑一条小命令自检，打印 `post-task selftest: ok`，失败返回码 2。
+- 命令：`/help` `/ws` `/tools` `/clear` `/exit`；行首 `!命令` 直接在本地跑，不走模型。
+- 非交互：`powershell -File .\agent.ps1 -Once "看看这里有什么文件"`。
+
+`-selftest` 可单独验证四个工具与越界拦截（6 项检查）。
+
+安全提醒：`run_command` 用的是你当前账户权限，删文件/装东西都做得到。不确定的仓库先 `-OutFile` 下来看一遍再跑。
+
 ## 已知限制（正在做）
 
 - 常驻方式仍是"wscript 包 vbs 后台跑 pythonw"，没做成托盘程序。
