@@ -1,4 +1,4 @@
-# dsh-qq-bridge 一键安装（Windows PowerShell）
+﻿# dsh-qq-bridge 一键安装（Windows PowerShell）
 #   一键：irm https://333332522455.github.io/ai-butler/qq-bridge-install.ps1 | iex
 #   可选参数：-Dir <装到哪> -Version <版本> -ZipPath <本地zip> -NodePath <node.exe 路径>
 [CmdletBinding()]
@@ -92,7 +92,8 @@ Say "已解压到 $Dir"
 
 # ---- 4. 记住 node 路径、生成双击可运行的入口 ----
 if (-not (Test-Path $stateDir)) { New-Item -ItemType Directory -Path $stateDir -Force | Out-Null }
-Set-Content -Path (Join-Path $stateDir 'node.path') -Value $nodeExe -Encoding ASCII
+$utf8noBom = New-Object System.Text.UTF8Encoding($false)
+[IO.File]::WriteAllText((Join-Path $stateDir 'node.path'), $nodeExe, $utf8noBom)
 Set-Location $Dir
 $cli = Join-Path $Dir 'bin\qq-bridge.mjs'
 if (Test-Path $cli) {
@@ -102,8 +103,8 @@ if (Test-Path $cli) {
 $nl = [Environment]::NewLine
 $cmdStart = @('@echo off', 'setlocal', 'chcp 65001 >nul', 'cd /d "%~dp0"', '"NODEEXE" "%~dp0bin\qq-bridge.mjs" start %*') -join $nl
 $cmdCheck = @('@echo off', 'setlocal', 'chcp 65001 >nul', 'cd /d "%~dp0"', '"NODEEXE" "%~dp0bin\qq-bridge.mjs" check %*', 'pause') -join $nl
-Set-Content -Path (Join-Path $Dir 'start.cmd') -Value ($cmdStart.Replace('NODEEXE', $nodeExe)) -Encoding ASCII
-Set-Content -Path (Join-Path $Dir 'check.cmd') -Value ($cmdCheck.Replace('NODEEXE', $nodeExe)) -Encoding ASCII
+[IO.File]::WriteAllText((Join-Path $Dir 'start.cmd'), $cmdStart.Replace('NODEEXE', $nodeExe), $utf8noBom)
+[IO.File]::WriteAllText((Join-Path $Dir 'check.cmd'), $cmdCheck.Replace('NODEEXE', $nodeExe), $utf8noBom)
 
 Write-Host ''
 Write-Host '  装好了。' -ForegroundColor Green
