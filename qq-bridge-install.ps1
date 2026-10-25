@@ -4,7 +4,7 @@
 [CmdletBinding()]
 param(
   [string]$Dir = (Join-Path $HOME 'dsh-qq-bridge'),
-  [string]$Version = '1.0.0',
+  [string]$Version = '1.0.1',
   [string]$ZipPath = '',
   [string]$NodePath = ''
 )
