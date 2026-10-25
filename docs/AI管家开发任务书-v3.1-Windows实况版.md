@@ -305,3 +305,90 @@ irm dsh.example.com/i -OutFile install.ps1; notepad install.ps1; .\install.ps1
 | L6 别碰进程 | 与 restart-dsh.py 冲突 | 改为"不碰内核驱动与系统服务" |
 | 成本 40–80 元/月 | 估低 | 改日预算 3 元硬上限 |
 | 总周期 11–14 周 | 大部分已做完 | 压到 3–4 周拿 90% 价值 |
+
+## 自我认知：这台机器上到底有哪些能力
+
+> 本节不是愿景，是**从真实配置反推**的能力清单：插件的权威来源是 profile 的 `cordis.patch.yml`，常驻服务的权威来源是 `start-all.ps1`。
+> 漂移检查：`python tools/selfmap.py`（退出码 0 = 全部点名；2 = 文档漏了某个插件/服务；1 = 环境问题）。**新增或删掉插件/服务后必须跑一次。**
+
+### 插件（31 个）
+
+| 插件 id | 干什么 |
+| --- | --- |
+| `desktop-shell` | DSH 桌面壳（Electron 主进程/窗口/托盘） |
+| `desktop-notifications` | 桌面通知（气泡/系统通知） |
+| `subagent-model-selection-settings` | 子代理模型选择设置页 |
+| `ui-settings-account` | 设置 → 账户页 |
+| `ui-chat` | 聊天主界面（含插件管理入口） |
+| `ui-settings` | 设置页骨架 |
+| `memory-eternal` | 记忆核心（SQLite 知识库 + memory_recall） |
+| `agent-preset-registry` | agent 预设注册表 |
+| `permission` | 权限判定（工具/路径） |
+| `approval` | 审批链（放宽权限/危险操作询问） |
+| `agent-snapshot-tool` | agent-snapshot：快照/验证/项目档案工具 |
+| `kujira` | 鲸鱼娘：审计流水、教训库、技能蒸馏 |
+| `agent-default-model` | 默认模型档位配置 |
+| `wechat-bridge` | 微信桥（消息进出） |
+| `rollover` | 会话接棒（HTTP /ai-butler/rollover/*） |
+| `phone-approval` | 手机通道审批 |
+| `local-model-tool` | local_ask：本机 llama.cpp Qwen3-4B |
+| `residents-tool` | 常驻服务体检/一键拉起（resident_status / start_residents） |
+| `llm-pi-ai` | pi-ai 线路适配 |
+| `compaction-basic` | 基础上下文压实 |
+| `memory-boost` | 记忆增强（自动注入背景卡） |
+| `furongjun1999-dsh-memory` | 外部记忆插件 |
+| `profile-guard` | profile 配置守卫（快照/体检/还原） |
+| `workspace-changes` | 工作区改动视图 |
+| `sandbox-node-shim` | 沙箱 runner 覆写（受限模式下真跑命令） |
+| `univer` | 表格/文档渲染（Univer） |
+| `mcp-connector` | MCP 连接器 |
+| `dsh-mattpocock-skills-deck` | 技能 deck |
+| `dsh-mattpocock-skills-deck-tools` | 技能 deck 工具 |
+| `browserskill` | 浏览器技能（bsk_* 全家桶） |
+| `llm-deepseek` | DeepSeek 上游线路 |
+
+### 常驻服务（18 个）
+
+| 服务 | 干什么 |
+| --- | --- |
+| 本机模型 | llama.cpp 8080，按需拉起，不花云 token |
+| 路由代理 | 8090，统一上游/免费线路 |
+| QQ 桥 | 43124，QQ 消息与 DSH 会话互通 |
+| 会话看门狗 | 会话文件异常/超大时处置 |
+| DSH 界面 | DSH Desktop 主进程 |
+| 主动通知 | QQ/桌面主动推送 |
+| 备份守护 | 定时把关键状态复制到 backup |
+| 微信监测 | 微信消息监测 |
+| 上课提醒 | 课表提醒（含本周课表图 06:40 推送） |
+| 手机通道 | 手机审批/文件通道 |
+| 后台补发 | 补发漏掉的提醒 |
+| 网关看门狗 | 代理/线路健康检查与重拉 |
+| 本地推送 | 本机推送通道 |
+| 操控气泡 | 浮动操控条 |
+| 全局呼出 | 全局热键呼出 |
+| 事件总线 | 内部事件分发 |
+| 自我自愈 | 自检常驻服务并修复 |
+| 步数进度 | 气泡显示「第 N 步」 |
+
+### 我实际能干的事（按能力归类）
+
+- **读代码/改代码/验证**：读写文件、grep/glob、bash/pwsh、快照（agent_snap）、自动验证（agent_verify / handoff.py verify）、第二双眼睛评审（second_eyes，T0 机械规则 → T1 免费模型 → T2 强模型）。
+- **跨会话记忆**：记忆核心（memory_recall / 自动沉淀）、journal（handoff.py note，带证据）、踩坑账本（trap）、路标（SIGNPOSTS）、任务账本（tasks.json）。
+- **与学生生活打通**：QQ 桥（对话即接口）、课表提醒（出门时刻）、晚自习、主动通知、手机审批。
+- **桌面与界面**：desktop.py 桌面操作、ui_tree.py 结构化眼睛、操控气泡/全局呼出、浏览器（bsk_*）。
+- **会话运维**：预压缩（bili）、接棒（rollover + watch-notify）、自动归档、会话体检（sessions）。
+- **多机/多模型**：subagent / subagent_fork、本机小模型 local_ask（翻译/摘要/短材料）、免费线路代理。
+- **内容生产**：程序渲染漫剧/短片（render.py + ffmpeg）、图片/课表图、音乐合成（numpy 生成 WAV）。
+
+### 我没有的（别装作有）
+
+- 不能替用户做真人要做的动作（去实验室、上课、签字）。
+- 不能保证外部服务可用（QQ/微信/上游模型/网络），只能报状态。
+- 不做 AI 视频生成/真人拍摄；视频是程序逐帧渲染 + ffmpeg 编码。
+- 不删除用户数据（会话/记忆/日志），只能备份、报告、在明确授权下处理残留文件。
+
+### 维护规则
+
+1. 新增/移除插件或常驻服务后，改本节表格并跑 `python tools/selfmap.py` 确认退出码 0。
+2. 本节描述的是**实现**，不是「应该有什么」；拿不准就去读 `cordis.patch.yml` 与 `start-all.ps1`。
+3. 与 AGENTS.md 冲突时以 AGENTS.md 为准（那是硬规矩，这里是能力地图）。
