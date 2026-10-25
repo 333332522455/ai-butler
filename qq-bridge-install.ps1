@@ -97,8 +97,19 @@ $utf8noBom = New-Object System.Text.UTF8Encoding($false)
 Set-Location $Dir
 $cli = Join-Path $Dir 'bin\qq-bridge.mjs'
 if (Test-Path $cli) {
-  $initOut = & $nodeExe $cli init 2>&1
-  Say (($initOut | Out-String).Trim())
+  $prevEa = $ErrorActionPreference
+  $ErrorActionPreference = 'Continue'
+  for ($try = 1; $try -le 2; $try++) {
+    try {
+      $initOut = & $nodeExe $cli init 2>&1
+      Say (($initOut | Out-String).Trim())
+      break
+    } catch {
+      if ($try -eq 2) { Say "  配置初始化跳过（稍后运行 check.cmd 可重试）：$($_.Exception.Message) " }
+      else { Start-Sleep -Milliseconds 500 }
+    }
+  }
+  $ErrorActionPreference = $prevEa
 }
 $nl = [Environment]::NewLine
 $cmdStart = @('@echo off', 'setlocal', 'chcp 65001 >nul', 'cd /d "%~dp0"', '"NODEEXE" "%~dp0bin\qq-bridge.mjs" start %*') -join $nl
