@@ -66,6 +66,27 @@ powershell -NoProfile -ExecutionPolicy Bypass -File .\uninstall.ps1            #
 powershell ... -File .\uninstall.ps1 -KeepFiles                              # 只停进程/注销任务，留文件
 ```
 
+## QQ 桥（可选模块）
+
+把 QQ 机器人接进 DSH：手机 QQ 发条消息 → DSH 里跑一轮 → 结果回 QQ。独立、可选、不装也不影响主程序。
+
+一条命令装（Windows PowerShell，需要 Node 18+）：
+
+```powershell
+irm https://333332522455.github.io/ai-butler/qq-bridge-install.ps1 | iex
+```
+
+装到 `%USERPROFILE%\dsh-qq-bridge`，只解压不联网注册、不写系统服务。装完：
+
+```powershell
+notepad $HOME\dsh-qq-bridge\.state\qq.json   # 填 AppID / AppSecret（在 https://q.qq.com/ 建机器人拿）
+.\dsh-qq-bridge\check.cmd                      # 自检
+.\dsh-qq-bridge\start.cmd                      # 起桥
+```
+
+可调参数：`-Dir <装到哪>`、`-Version`、`-ZipPath <本地zip>`（离线装）、`-NodePath <node.exe>`（node 不在 PATH 时）。
+包里带完整 README；卸载直接删安装目录。
+
 ## 数据放在哪
 
 不写死任何绝对路径：数据目录 = 安装目录（`tools/` 的上一级），可用环境变量覆盖。
